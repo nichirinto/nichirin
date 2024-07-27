@@ -2,36 +2,23 @@ package signupusecase
 
 import (
 	authdto "github.com/nichirinto/nichirin/example/common/dto/auth"
-	authexception "github.com/nichirinto/nichirin/example/common/exception/auth"
-	"github.com/nichirinto/nichirin/example/storage/db/repo"
-	userrepo "github.com/nichirinto/nichirin/example/storage/db/repo/user"
-	"github.com/nichirinto/nichirin/framework/common/exception"
 	"github.com/nichirinto/nichirin/framework/core"
 )
 
-func Handle(c *core.Context[authdto.SignUpInputDto]) *core.Res[authdto.SignUpOutputDto] {
+func Handle(c context) *core.Res[authdto.SignUpOutputDto] {
 	c.Logger.Info(c.Input.Password)
 
 	res := &authdto.SignUpOutputDto{}
 
-	existed, e := repo.User.FindByEmail(c.Input.Username)
-
+	e := checkUsernameExisted(c)
 	if e != nil {
-		return core.CreateResponse(res, exception.ServerError)
-	}
-	if existed != nil {
-		return core.CreateResponse(res, authexception.NewUsernameExistedException())
+		return core.CreateResponse(res, e)
 	}
 
-	user, e := repo.User.CreateNew(&userrepo.CreateUserInput{
-		Username: c.Input.Username,
-		Password: c.Input.Password,
-	})
+	user, e := createUser(c)
 	if e != nil {
-		return core.CreateResponse(res, authexception.NewUsernameExistedException())
+		return core.CreateResponse(res, e)
 	}
-
-	c.Logger.Info(user.Id)
 
 	res.UserId = user.Id
 
