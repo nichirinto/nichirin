@@ -3,27 +3,44 @@ package core
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/nichirinto/nichirin/framework/common/exception"
+	"github.com/nichirinto/nichirin/framework/lib/logger"
 	"net/http"
 )
 
 type Nichirin struct {
-	Engine *chi.Mux
+	Engine  *chi.Mux
+	Address string
 }
 
-type HttpMethod string
+type Router[TI any, TO any] struct {
+	Name      string
+	Method    HttpMethod
+	Url       string
+	AuthGuard bool
+	Handler   func(*Context[TI]) *Res[TO]
+}
 
-const (
-	Get     HttpMethod = http.MethodGet
-	Post    HttpMethod = http.MethodPost
-	Put     HttpMethod = http.MethodPut
-	Patch   HttpMethod = http.MethodPatch
-	Delete  HttpMethod = http.MethodDelete
-	Head    HttpMethod = http.MethodHead
-	Options HttpMethod = http.MethodOptions
-)
+type Context[T any] struct {
+	Request *http.Request
+	TraceId string
+	Input   *T
+	Logger  *logger.Logger
 
-type Controller[I any, O any] struct {
-	Url     string
-	Method  HttpMethod
-	Handler func(Nichirin, I) (O, exception.Exception)
+	Timeline ContextTimeline
+}
+
+type ContextTimeline struct {
+	Started  int64
+	Finished int64
+}
+
+type Res[T any] struct {
+	Data *T                  `json:"data"`
+	Err  exception.Exception `json:"error"`
+}
+
+type ResPayload[T any] struct {
+	Code    string `json:"code"`
+	Data    *T     `json:"data"`
+	Message string `json:"message"`
 }

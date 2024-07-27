@@ -6,35 +6,33 @@ import (
 	"net/http"
 )
 
-type WebResponse[T any] struct {
-	Code    string
-	Data    *T
-	Message string
+func ThrowBadRequest(w http.ResponseWriter, err error) {
+	res := new(Res[interface{}])
+
+	res.Err = exception.NewWithErr(exception.BadRequestErrorCode, err.Error(), err)
+
+	SendResponse[interface{}](w, res)
 }
 
-func sendResponse[T any](w http.ResponseWriter, data *T, err *exception.Exception) {
-	response := WebResponse[T]{Data: data}
+func SendResponse[T any](w http.ResponseWriter, v *Res[T]) {
+	if v.Err != nil {
+		statusCode := v.Err.StatusCode
 
-	if err != nil {
-		response.Code = err.Code
-		response.Message = err.Message
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	json.NewEncoder(w).Encode(response)
-}
-
-func handle[I any, O any](controller Controller[I, O]) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		input := new(I)
-		err := json.NewDecoder(r.Body).Decode(input)
-		if err != nil {
-			w.Header().Set("Content-Type", "application/json")
+		if statusCode < 200 || statusCode >= 600 {
+			statusCode = http.StatusBadRequest
 		}
+
+		w.WriteHeader(statusCode)
 	}
-}
 
-func InitController[I any, O any](controller Controller[I, O]) {
+	res := new(ResPayload[T])
+	res.Data = v.Data
+	res.Code = "OK"
 
+	if v.Err != nil {
+		res.Code = v.Err.Code
+		res.Message = v.Err.Message
+	}
+
+	_ = json.NewEncoder(w).Encode(res)
 }

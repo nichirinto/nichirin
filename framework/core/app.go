@@ -2,17 +2,24 @@ package core
 
 import (
 	"github.com/go-chi/chi/v5"
+	"github.com/nichirinto/nichirin/framework/lib/logger"
 	"net/http"
 )
 
-func NewApp() *Nichirin {
+func NewApp(addr string) *Nichirin {
 	r := chi.NewRouter()
 
 	return &Nichirin{
-		Engine: r,
+		Engine: r, Address: addr,
 	}
 }
 
-func (r *Nichirin) Listen(addr string) {
-	http.ListenAndServe(addr, r.Engine)
+func (s *Nichirin) StartServer() {
+	logger.Log.Info("Server started")
+	logger.Log.Info(s.Address)
+
+	if err := http.ListenAndServe(s.Address, s.Engine); err != nil {
+		logger.Log.Error(err.Error())
+		panic(err)
+	}
 }
