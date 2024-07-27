@@ -47,6 +47,10 @@ func (r *Router[T, I]) Attach(app *Nichirin) *Router[T, I] {
 		res := r.Handler(c)
 		c.Timeline.Finished = datetime.Unix()
 
+		if res.Err != nil {
+			c.Logger.Error(res.Err.Err.Error())
+		}
+
 		SendResponse(w, res)
 	})
 
