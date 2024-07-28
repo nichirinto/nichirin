@@ -1,16 +1,17 @@
 package ping
 
-import "github.com/nichirinto/nichirin/framework/core"
+import (
+	"github.com/nichirinto/nichirin/framework/common/dto"
+	"github.com/nichirinto/nichirin/framework/core"
+)
 
-type AuthInputDto struct{}
-
-type AuthOutputDto struct {
+type PingOutputDto struct {
 	Pong bool `json:"pong"`
 }
 
 func PingRoute(app *core.Nichirin, url string) {
-	new(core.Router[AuthInputDto, AuthOutputDto]).Path(url).Handle(func(*core.Context[AuthInputDto]) *core.Res[AuthOutputDto] {
-		return core.CreateResponse(&AuthOutputDto{
+	new(core.Router[dto.EmptyDto, PingOutputDto]).Path(url).Handle(func(*core.Context[dto.EmptyDto]) *core.Res[PingOutputDto] {
+		return core.CreateResponse(&PingOutputDto{
 			Pong: true,
 		}, nil)
 	}).Attach(app)
