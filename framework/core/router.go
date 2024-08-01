@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"github.com/go-playground/validator/v10"
 	"github.com/nichirinto/nichirin/framework/lib/datetime"
 	"net/http"
 )
@@ -31,8 +32,13 @@ func (r *Router[T, I]) Attach(app *Nichirin) *Router[T, I] {
 
 		input := new(T)
 
-		err := json.NewDecoder(req.Body).Decode(input)
-		if err != nil {
+		if err := json.NewDecoder(req.Body).Decode(input); err != nil {
+			ThrowBadRequest(w, err)
+			return
+		}
+
+		validate := validator.New(validator.WithRequiredStructEnabled())
+		if err := validate.Struct(req.Body); err != nil {
 			ThrowBadRequest(w, err)
 			return
 		}
