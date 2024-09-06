@@ -7,8 +7,11 @@ import (
 	"net/http"
 )
 
-func NewApp(addr string) *Nichirin {
+func Init() {
 	_ = godotenv.Load()
+}
+
+func NewApp(addr string) *Nichirin {
 
 	r := chi.NewRouter()
 
