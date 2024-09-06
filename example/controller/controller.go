@@ -1,8 +1,7 @@
 package controller
 
-import "github.com/nichirinto/nichirin/framework/core"
+import "github.com/nichirinto/nichirin/example/use-case/ping/ping"
 
-func Init(app *core.Nichirin) {
-	Auth(app)
-	Ping(app)
+func init() {
+	ping.Handle()
 }

@@ -1,15 +1,14 @@
-package pingusecase
+package ping
 
 import (
-	pingdto "github.com/nichirinto/nichirin/example/common/dto/ping"
+	"github.com/nichirinto/nichirin/example/engine"
 	"github.com/nichirinto/nichirin/framework/core"
-	"github.com/nichirinto/nichirin/framework/lib/datetime"
 )
 
-func Handle(context *core.Context[pingdto.PingInputDto]) *core.Res[pingdto.PingOutputDto] {
-	res := &pingdto.PingOutputDto{
-		Time: datetime.Unix(),
-	}
+func Handle() {
+	new(Router).Register(engine.App, core.Get, "/", handle)
+}
 
-	return core.CreateResponse(res, nil)
+func handle(ctx Ctx) Output {
+	return ctx.Return(&Response{Message: "pong"})
 }

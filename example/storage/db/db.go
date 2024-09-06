@@ -8,10 +8,10 @@ import (
 var Db *pg.NichirinPg
 
 func Init() {
-	db, err := pg.NewPg("postgres://admin:123456@localhost:5432/test")
+	db, _ := pg.NewPg("postgres://admin:123456@localhost:5432/test")
 
-	if err != nil {
-		panic(err)
+	if db == nil {
+		return
 	}
 
 	Db = db

@@ -17,14 +17,16 @@ type Router[TI any, TO any] struct {
 	Method    HttpMethod
 	Url       string
 	AuthGuard bool
-	Handler   func(*Context[TI]) *Res[TO]
+	Handler   func(*Context[TI, TO]) *Res[TO]
 }
 
-type Context[T any] struct {
-	Request *http.Request
-	TraceId string
-	Input   *T
-	Logger  *logger.Logger
+type Context[TI any, TO any] struct {
+	Request   *http.Request
+	TraceId   string
+	Input     *TI
+	Output    *TO
+	Exception exception.Exception
+	Logger    *logger.Logger
 
 	Timeline ContextTimeline
 }
