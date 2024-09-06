@@ -2,11 +2,14 @@ package core
 
 import (
 	"github.com/go-chi/chi/v5"
+	"github.com/joho/godotenv"
 	"github.com/nichirinto/nichirin/framework/lib/logger"
 	"net/http"
 )
 
 func NewApp(addr string) *Nichirin {
+	_ = godotenv.Load()
+
 	r := chi.NewRouter()
 
 	return &Nichirin{
