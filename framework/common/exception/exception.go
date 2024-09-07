@@ -16,23 +16,6 @@ type RuntimeException struct {
 
 type Exception = *RuntimeException
 
-type Result[T any] struct {
-	Exception *RuntimeException
-	Return    T
-}
-
-func ReturnResult[T any](ret T) Result[T] {
-	return Result[T]{
-		Return: ret,
-	}
-}
-
-func ThrowException[T any](exception *RuntimeException) Result[T] {
-	return Result[T]{
-		Exception: exception,
-	}
-}
-
 func (r Exception) Log(logger *logger.Logger) {
 	logger.Error(r.Message, zap.String("code", r.Code), zap.Any("status", r.StatusCode))
 }
